@@ -56,8 +56,18 @@ const usePlanetHook = () => {
     }
   };
 
-  const searchPlanets = (searchToken: string): Promise<GetPlanetResponse> => {
-    return [];
+  //simulating web response
+  const searchPlanets = (
+    searchToken: string,
+    planets: GetPlanetResponse | null,
+  ): GetPlanetResponse | null => {
+    if (!planets) return null;
+
+    let newResults = planets.results.filter(r =>
+      r.planet.name.toLowerCase().includes(searchToken.toLowerCase()),
+    );
+    planets.results = newResults;
+    return JSON.parse(JSON.stringify(planets));
   };
 
   return {

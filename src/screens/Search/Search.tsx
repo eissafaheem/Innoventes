@@ -10,7 +10,8 @@ const Search = (): React.JSX.Element => {
   const [searchToken, setSearchToken] = useState<string>('');
   const {getPlanetsByPage, searchPlanets} = usePlanetHook();
 
-  const [planets, setPlanets] = useState<GetPlanetResponse>();
+  const [planets, setPlanets] = useState<GetPlanetResponse | null>(null);
+  const [searchRes, setSearchRes] = useState<GetPlanetResponse | null>(null);
   const [page, setPage] = useState<number>(1);
   const [hasMore, sethasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,27 +23,30 @@ const Search = (): React.JSX.Element => {
     getPlanets();
   }, [page]);
 
-  useEffect(() => {}, [searchToken]);
-//   useEffect(() => {
-//     checklargest();
-//   }, [planets]);
+  useEffect(() => {
+    searchByToken();
+  }, [searchToken]);
+
+  // useEffect(() => {
+  //   checklargest();
+  // }, [planets?.results]);
 
   const searchByToken = async () => {
     setIsLoading(true);
     try {
-      const planets = await searchPlanets(searchToken);
-      console.log(planets);
-      if (!planets || !planets.results.length) sethasMore(false);
-      if (planets) {
-        setPlanets(planets);
-      }
-      setIsLoading(false);
+      //simulating rest call
+      let updatedList: GetPlanetResponse = JSON.parse(JSON.stringify(planets));
+      updatedList.results = updatedList.results.filter(p =>
+        p.planet.name.toLowerCase().includes(searchToken.toLowerCase()),
+      );
+      setSearchRes(updatedList);
     } catch (error) {
       //show custom toaster message, no time
       setIsLoading(false);
     }
   };
 
+  //getting next url from 1st page as page 1 hats why repeated pages, should get next:....page=2
   const getPlanets = async () => {
     setIsLoading(true);
     try {
@@ -66,13 +70,11 @@ const Search = (): React.JSX.Element => {
 
   const checklargest = () => {
     if (!planets?.results.length) return;
+
     let largest: Planet | null = null;
     for (let i = 0; i < planets?.results.length; i++) {
       if (planets.results[i].planet.population === 'unknown') continue;
-      if (
-        largest &&
-        largest.population < planets.results[i].planet.population
-      ) {
+      if ((largest?.population || 0) < planets.results[i].planet.population) {
         largest = planets.results[i].planet;
       }
     }
@@ -99,7 +101,11 @@ const Search = (): React.JSX.Element => {
         placehoolder="Search planets here..."
       />
       <FlatList
-        data={planets?.results}
+        data={
+          searchToken.length > 0
+            ? searchRes?.results || []
+            : planets?.results || []
+        }
         renderItem={({item, index}) => (
           <PlanetCard
             hasMaxPopulation={item.hasMaxPopulation}
