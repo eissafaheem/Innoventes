@@ -27,9 +27,9 @@ const Search = (): React.JSX.Element => {
     searchByToken();
   }, [searchToken]);
 
-  // useEffect(() => {
-  //   checklargest();
-  // }, [planets?.results]);
+  useEffect(() => {
+    if (isLoading === false) checklargest();
+  }, [isLoading]);
 
   const searchByToken = async () => {
     setIsLoading(true);
@@ -79,10 +79,14 @@ const Search = (): React.JSX.Element => {
       }
     }
 
+    console.log('-------------------', largest);
+
     let updatedList: GetPlanetResponse = JSON.parse(JSON.stringify(planets));
     for (let i = 0; i < updatedList?.results.length; i++) {
       if (updatedList.results[i].planet.id === largest?.id) {
         updatedList.results[i].hasMaxPopulation = true;
+      } else {
+        updatedList.results[i].hasMaxPopulation = false;
       }
     }
 
