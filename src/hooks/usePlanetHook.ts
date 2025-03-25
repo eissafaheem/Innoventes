@@ -6,21 +6,20 @@ import {PlanetDetails} from '../screens/Search/PlanetCard/PLanetCard';
 
 const usePlanetHook = () => {
   const getPlanetsByPage = async (
+    next: string,
     page: number,
-  ): Promise<PlanetDetails[] | null> => {
-    const response = await fetch(
-      `https://swapi.dev/api/planets/?page=${page}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+  ): Promise<GetPlanetResponse> => {
+    const response = await fetch(next, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+    });
     if (response.status === HTTP_STATUS.OK) {
-      const json: GetPlanetResponse = await response.json();
-      const planetsArr = json.results;
+      const getPlanetResponse: GetPlanetResponse = await response.json();
+      const planetsArr = getPlanetResponse.results;
       const planetCardPropsArr = [];
+      console.log('eissa', getPlanetResponse);
 
       for (let i = 0; i < planetsArr.length; i++) {
         const planetDetails: PlanetDetails = {
@@ -33,20 +32,22 @@ const usePlanetHook = () => {
       let planetWithMaxPopulation: Planet | null = null;
 
       for (let i = 0; i < planetCardPropsArr.length; i++) {
+        if (planetCardPropsArr[i].planet.population === 'unknown') continue;
+
         if (
-          (planetWithMaxPopulation?.population || 0) < planetCardPropsArr[i].planet.population
+          (planetWithMaxPopulation?.population || 0) <
+          planetCardPropsArr[i].planet.population
         ) {
           planetWithMaxPopulation = planetCardPropsArr[i].planet;
         }
       }
-      console.log("here",planetWithMaxPopulation)
       for (let i = 0; i < planetCardPropsArr.length; i++) {
         if (planetWithMaxPopulation?.id === planetCardPropsArr[i].planet.id) {
           planetCardPropsArr[i].hasMaxPopulation = true;
         }
       }
-
-      return planetCardPropsArr;
+      getPlanetResponse.results = planetCardPropsArr;
+      return getPlanetResponse;
     } else if (response.status === HTTP_STATUS.NOT_FOUND) {
       return [];
     } else {
@@ -57,7 +58,7 @@ const usePlanetHook = () => {
 
   const searchPlanets = (
     searchToken: string,
-  ): Promise<PlanetDetails[] | null> => {
+  ): Promise<GetPlanetResponse> => {
     return [];
   };
 

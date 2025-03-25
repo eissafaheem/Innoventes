@@ -4,15 +4,19 @@ import {useEffect, useState} from 'react';
 import usePlanetHook from '../../hooks/usePlanetHook';
 import PlanetCard, {PlanetDetails} from './PlanetCard/PLanetCard';
 import {Planet} from '../../dataTypes/Planet';
+import {GetPlanetResponse} from '../../dataTypes/GetPLanetResponse';
 
 const Search = (): React.JSX.Element => {
   const [searchToken, setSearchToken] = useState<string>('');
   const {getPlanetsByPage, searchPlanets} = usePlanetHook();
 
-  const [planets, setPlanets] = useState<PlanetDetails[]>();
+  const [planets, setPlanets] = useState<GetPlanetResponse>();
   const [page, setPage] = useState<number>(1);
   const [hasMore, sethasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [url, setUrl] = useState<string>(
+    `https://swapi.dev/api/planets/?page=1`,
+  );
 
   useEffect(() => {
     getPlanets();
@@ -25,8 +29,10 @@ const Search = (): React.JSX.Element => {
     try {
       const planets = await searchPlanets(searchToken);
       console.log(planets);
-      if (!planets || !planets.length) sethasMore(false);
-      if (planets) setPlanets(planets);
+      if (!planets || !planets.results.length) sethasMore(false);
+      if (planets) {
+        setPlanets(planets);
+      }
       setIsLoading(false);
     } catch (error) {
       //show custom toaster message, no time
@@ -37,10 +43,17 @@ const Search = (): React.JSX.Element => {
   const getPlanets = async () => {
     setIsLoading(true);
     try {
-      const planets = await getPlanetsByPage(page);
+      const planets = await getPlanetsByPage(url, page);
+      console.log('Eissa look here', url);
       console.log(planets);
-      if (!planets || !planets.length) sethasMore(false);
-      if (planets) setPlanets(planets);
+      if (!planets?.results || !planets.results.length) sethasMore(false);
+      if (planets) {
+        setUrl(planets.next);
+        setPlanets(prev => {
+          planets.results = [...(prev?.results || []), ...planets.results];
+          return planets;
+        });
+      }
       setIsLoading(false);
     } catch (error) {
       //show custom toaster message, no time
@@ -60,7 +73,7 @@ const Search = (): React.JSX.Element => {
         placehoolder="Search planets here..."
       />
       <FlatList
-        data={planets}
+        data={planets?.results}
         renderItem={({item, index}) => (
           <PlanetCard
             hasMaxPopulation={item.hasMaxPopulation}

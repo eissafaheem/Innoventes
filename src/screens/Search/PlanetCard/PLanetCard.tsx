@@ -20,8 +20,8 @@ const PlanetCard = (props: PlanetDetails) => {
 
         backgroundColor: hasMaxPopulation ? 'green' : 'white',
       }}>
-      <Text>{name}</Text>
-      <Text>{population}</Text>
+      <Text style={{fontSize: hasMaxPopulation ? 50 : 20}}>{name}</Text>
+      <Text style={{fontSize: hasMaxPopulation ? 50 : 20}}>{population}</Text>
     </View>
   );
 };
