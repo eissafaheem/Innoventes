@@ -2,14 +2,14 @@ import {ActivityIndicator, FlatList, Text, View} from 'react-native';
 import InnoventesInput from '../../components/InnoventesInput/InnoventesInput';
 import {useEffect, useState} from 'react';
 import usePlanetHook from '../../hooks/usePlanetHook';
-import PlanetCard from './PlanetCard/PLanetCard';
+import PlanetCard, {PlanetDetails} from './PlanetCard/PLanetCard';
 import {Planet} from '../../dataTypes/Planet';
 
 const Search = (): React.JSX.Element => {
   const [searchToken, setSearchToken] = useState<string>('');
-  const {getPlanetsByPage} = usePlanetHook();
+  const {getPlanetsByPage, searchPlanets} = usePlanetHook();
 
-  const [planets, setPlanets] = useState<Planet[]>();
+  const [planets, setPlanets] = useState<PlanetDetails[]>();
   const [page, setPage] = useState<number>(1);
   const [hasMore, sethasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -17,6 +17,22 @@ const Search = (): React.JSX.Element => {
   useEffect(() => {
     getPlanets();
   }, [page]);
+
+  useEffect(() => {}, [searchToken]);
+
+  const searchByToken = async () => {
+    setIsLoading(true);
+    try {
+      const planets = await searchPlanets(searchToken);
+      console.log(planets);
+      if (!planets || !planets.length) sethasMore(false);
+      if (planets) setPlanets(planets);
+      setIsLoading(false);
+    } catch (error) {
+      //show custom toaster message, no time
+      setIsLoading(false);
+    }
+  };
 
   const getPlanets = async () => {
     setIsLoading(true);
@@ -46,9 +62,13 @@ const Search = (): React.JSX.Element => {
       <FlatList
         data={planets}
         renderItem={({item, index}) => (
-          <PlanetCard hasMaxPopulation={false} planet={item} key={item.id} />
+          <PlanetCard
+            hasMaxPopulation={item.hasMaxPopulation}
+            planet={item.planet}
+            key={item.planet.id}
+          />
         )}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.planet.id}
         onEndReached={getMore}
         ListFooterComponent={
           isLoading && hasMore ? <ActivityIndicator /> : null
