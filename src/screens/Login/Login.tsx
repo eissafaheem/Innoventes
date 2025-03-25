@@ -9,11 +9,19 @@ import {RootNavigationProps} from '../../App';
 const Login = (): React.JSX.Element => {
   const [username, setUserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const navigation = useNavigation<NavigationProp<RootNavigationProps>>();
 
   const loginUser = () => {
     console.log(username, password);
-    navigation.navigate('search');
+    //This should be a rest call
+    if (
+      username.toLowerCase() === 'Luke Skywalker'.toLowerCase() &&
+      password === '19BBY'
+    ) {
+      navigation.navigate('search');
+      setError('');
+    } else setError('Invalid username or password');
   };
 
   return (
@@ -30,6 +38,7 @@ const Login = (): React.JSX.Element => {
         placehoolder="Enter Password"
       />
       <InnoventesButton title="Login" onPress={loginUser} />
+      <Text style={{color: 'red'}}>{error}</Text>
     </View>
   );
 };

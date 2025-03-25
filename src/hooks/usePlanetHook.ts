@@ -56,9 +56,7 @@ const usePlanetHook = () => {
     }
   };
 
-  const searchPlanets = (
-    searchToken: string,
-  ): Promise<GetPlanetResponse> => {
+  const searchPlanets = (searchToken: string): Promise<GetPlanetResponse> => {
     return [];
   };
 

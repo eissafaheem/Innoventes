@@ -23,6 +23,9 @@ const Search = (): React.JSX.Element => {
   }, [page]);
 
   useEffect(() => {}, [searchToken]);
+//   useEffect(() => {
+//     checklargest();
+//   }, [planets]);
 
   const searchByToken = async () => {
     setIsLoading(true);
@@ -59,6 +62,29 @@ const Search = (): React.JSX.Element => {
       //show custom toaster message, no time
       setIsLoading(false);
     }
+  };
+
+  const checklargest = () => {
+    if (!planets?.results.length) return;
+    let largest: Planet | null = null;
+    for (let i = 0; i < planets?.results.length; i++) {
+      if (planets.results[i].planet.population === 'unknown') continue;
+      if (
+        largest &&
+        largest.population < planets.results[i].planet.population
+      ) {
+        largest = planets.results[i].planet;
+      }
+    }
+
+    let updatedList: GetPlanetResponse = JSON.parse(JSON.stringify(planets));
+    for (let i = 0; i < updatedList?.results.length; i++) {
+      if (updatedList.results[i].planet.id === largest?.id) {
+        updatedList.results[i].hasMaxPopulation = true;
+      }
+    }
+
+    setPlanets(updatedList);
   };
 
   const getMore = () => {
