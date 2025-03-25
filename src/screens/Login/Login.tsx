@@ -3,12 +3,18 @@ import {Button, Text, TextInput, View} from 'react-native';
 import {User} from '../../dataTypes/User';
 import InnoventesInput from '../../components/InnoventesInput/InnoventesInput';
 import InnoventesButton from '../../components/InnoventesButton/InnoventesButton';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {RootNavigationProps} from '../../App';
 
 const Login = (): React.JSX.Element => {
   const [username, setUserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const navigation = useNavigation<NavigationProp<RootNavigationProps>>();
 
-  const loginUser = () => {};
+  const loginUser = () => {
+    console.log(username, password);
+    navigation.navigate('search');
+  };
 
   return (
     <View style={{flex: 1, marginTop: 200, gap: 16, paddingHorizontal: 16}}>
