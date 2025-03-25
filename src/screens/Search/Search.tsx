@@ -1,4 +1,4 @@
-import {FlatList, Text, View} from 'react-native';
+import {ActivityIndicator, FlatList, Text, View} from 'react-native';
 import InnoventesInput from '../../components/InnoventesInput/InnoventesInput';
 import {useEffect, useState} from 'react';
 import usePlanetHook from '../../hooks/usePlanetHook';
@@ -10,17 +10,30 @@ const Search = (): React.JSX.Element => {
   const {getPlanetsByPage} = usePlanetHook();
 
   const [planets, setPlanets] = useState<Planet[]>();
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, sethasMore] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     getPlanets();
-  }, []);
+  }, [page]);
 
   const getPlanets = async () => {
+    setIsLoading(true);
     try {
-      const planets = await getPlanetsByPage(1);
-      console.warn(planets);
+      const planets = await getPlanetsByPage(page);
+      console.log(planets);
+      if (!planets || !planets.length) sethasMore(false);
       if (planets) setPlanets(planets);
-    } catch (error) {}
+      setIsLoading(false);
+    } catch (error) {
+      //show custom toaster message, no time
+      setIsLoading(false);
+    }
+  };
+
+  const getMore = () => {
+    if (hasMore) setPage(prev => prev + 1);
   };
 
   return (
@@ -36,6 +49,10 @@ const Search = (): React.JSX.Element => {
           <PlanetCard hasMaxPopulation={false} planet={item} key={item.id} />
         )}
         keyExtractor={item => item.id}
+        onEndReached={getMore}
+        ListFooterComponent={
+          isLoading && hasMore ? <ActivityIndicator /> : null
+        }
       />
     </View>
   );

@@ -15,6 +15,7 @@ function App(): React.JSX.Element {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name={'login'} component={Login} />
+        {/* have a auth protected higher order component, no time */}
         <Stack.Screen name={'search'} component={Search} />
       </Stack.Navigator>
     </NavigationContainer>
