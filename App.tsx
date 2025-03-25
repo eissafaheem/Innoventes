@@ -7,7 +7,7 @@ function App(): React.JSX.Element {
   
   return (
     <View>
-      <Text>Eissa</Text>
+      <Text>Eidssa</Text>
     </View>
   );
 }
