@@ -56,6 +56,7 @@ const usePlanetHook = () => {
     }
   };
 
+  //   not in use
   //simulating web response
   const searchPlanets = (
     searchToken: string,
